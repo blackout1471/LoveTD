@@ -5,10 +5,17 @@
 --]]
 
 local hud = {mt = {}}
+local gameMenu = {mt = {}}
 
 local hud_color = {{0.5, 0.5, 0.5, 0.8}, {0.5, 0.5, 0.5, 0.1}}
 local hud_size = {w = 250, h = 50}
 local winX, winY = love.graphics.getWidth(), love.graphics.getHeight()
+
+--[[
+
+  HUD
+
+--]]
 
 function hud_createHUD()
   local obj = {}
@@ -87,5 +94,69 @@ function hud_hoverExit()
   for _, guiObj in pairs(hud.inst.bar) do
     local clr = {guiObj.color[1], guiObj.color[2], guiObj.color[3], 0.2}
     guiObj:setColor(clr)
+  end
+end
+
+--[[
+
+  GameMenu
+  Towers and such
+
+--]]
+
+local menu = {w = 100, h = winY, butW = 90, butH = 35, margin = 5}
+
+function create_towerMenu()
+  local obj = {}
+  
+  obj.rectangle = gui.createRectangle(winX - menu.w, 0, menu.w, menu.h, setAlphaInTable(Colors.grey, 0.1))
+  obj.rectangle:setHoverHandler('gameMenu_hoverEnter', 'gameMenu_hoverExit')
+  
+  for k, towerList in ipairs(t_towerList) do
+    obj[k] = gui.createButton((winX - menu.w) + menu.margin, (menu.butH*(k-1)) + menu.margin*k, menu.butW, menu.butH, towerList, setAlphaInTable(Colors.lightGrey, 0.1), Colors.white, 'Maps')
+    obj[k]:setClickHandler('gameMenu_clickTowerButton')
+  end
+  
+  
+  setmetatable(obj, gameMenu.mt)
+  gameMenu.inst = obj
+  
+  return obj
+end
+
+function gameMenu.mt:__index(k)
+  return gameMenu[k]
+end
+
+function gameMenu:destroy()
+  for _, menuItems in pairs(gameMenu.inst) do
+    gameMenu:destroy()
+    return true
+  end
+end
+
+-- HANDLERS for the menu
+
+function gameMenu_clickTowerButton(button)
+  local mx, my = love.mouse.getPosition()
+  
+  gameCreateTower(mx, my, button.text:lower())
+end
+
+function gameMenu_hoverEnter()
+  for k, menuItems in pairs(gameMenu.inst) do
+    local c
+    if k == 'rectangle' then c = 'color' else c = 'bgColor' end
+    local clr = {menuItems[c][1], menuItems[c][2], menuItems[c][3], 1}
+    menuItems[c] = clr
+  end
+end
+
+function gameMenu_hoverExit()
+  for k, menuItems in pairs(gameMenu.inst) do
+    local c
+    if k == 'rectangle' then c = 'color' else c = 'bgColor' end
+    local clr = {menuItems[c][1], menuItems[c][2], menuItems[c][3], 0.1}
+    menuItems[c] = clr
   end
 end

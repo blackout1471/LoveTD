@@ -70,9 +70,120 @@ function game.loadMap(imageMap, mapName)
   gameObj.hud:setCash(gameVar.cash)
   gameObj.hud:setHealth(gameVar.lives)
   gameObj.hud:setCurWave(gameVar.wave)
-  -- load gameCallBacks
-  registerAllTowerHandlers()
   
-  --TEST
-  gameObj.menu = tower_createTower_menu(winX, 0)
+  -- load tower menu
+  gameObj.menu = create_towerMenu()
+  
 end
+
+function gameCreateTower(x, y, strTower)
+  -- Check if enough funds.
+  local cash = gameObj.hud:getCash()
+  local towerCost = Towers[strTower].cost
+  if cash >= towerCost and curObj == nil then
+    gameObj.hud:setCash(cash-towerCost)
+    local tower = create_tower(strTower)
+    tower.isPlaced = false
+    tower.canSet   = false
+    
+    table.insert(gameObj.towers, tower)
+    curObj = tower
+    
+    tower:setPosition(x, y)
+    tower:setClickHandler('tower_click')
+  else
+    -- print error for user, not enough funds
+  end
+  
+  return true
+end
+
+function tower_click(tower)
+  curObj = tower
+  print('clicked')
+end
+
+function game_do_draw()
+  if gameObj then
+    
+    -- DRAW TOWERS
+    
+    for _, tower in ipairs(gameObj.towers) do
+      love.graphics.setColor(Colors.white)
+      love.graphics.draw(tower.imgBase, tower.x, tower.y, 0, tower.scaleX, tower.scaleY, tower.w/2, tower.h/2)
+      love.graphics.draw(tower.imgTop, tower.x, tower.y, tower.rot, tower.scaleX, tower.scaleY, tower.w/2, tower.h/2)
+      if curObj == tower then
+        -- Draw Tower Range
+        love.graphics.setColor(tower.rangeColor)
+        love.graphics.circle('fill', tower.x, tower.y, Towers[tower.towerType].range)
+        love.graphics.setColor(setAlphaInTable(Colors.white, 0.1))
+        love.graphics.rectangle('fill', tower.bbox[1], tower.bbox[2], tower.bbox[3]-tower.bbox[1], tower.bbox[4]-tower.bbox[2])
+      end
+    end
+  end
+  
+  -- DRAW ENEMIES
+  
+  -- DRAW PROJECTILES
+end
+registerGameCallBack('draw', 'game_do_draw')
+
+-- GAME UPDATE
+
+function game_do_update()
+  local mx, my = love.mouse.getPosition()
+  
+  if gameObj then
+    
+    -- TOWERS
+    for k, tower in ipairs(gameObj.towers) do
+      if tower.isPlaced == false then
+        tower:setPosition(mx, my)
+        
+        -- Check if tower is inside the deploy area
+        for k, poly in ipairs(t_map.area) do
+          if (isPointInsidePolygon(tower.bbox[1], tower.bbox[2], poly)) and (isPointInsidePolygon(tower.bbox[3], tower.bbox[4], poly)) then
+            tower.rangeColor = setAlphaInTable(Colors.green, 0.2)
+            tower.canSet = true
+            break
+          else
+            tower.canSet = false
+            tower.rangeColor = setAlphaInTable(Colors.red, 0.2)
+          end
+        end
+      end
+    end
+    
+    -- Enemies
+    -- projectiles
+  end
+end
+registerGameCallBack('update', 'game_do_update')
+
+-- GAME MOUSEPRESSED
+
+function game_do_mousepressed(intX, intY, strButton)
+  -- Towers
+  if strButton == 1 then
+    if curObj then
+      -- Check if tower can be set
+      if curObj.canSet == true and curObj.isPlaced == false then
+        curObj.isPlaced = true
+        curObj = nil
+      end
+    end
+  end
+  
+  -- Tower Click Handler
+  if gameObj then
+    for _, tower in ipairs(gameObj.towers) do
+      if tower.clickHandler then
+        if (isPointInsideBox(intX, intY, unpack(tower.bbox))) then
+          return _G[tower.clickHandler](tower, strButton, intX, intY)
+        end
+      end
+    end
+  end
+  
+end
+registerGameCallBack('mousepressed', 'game_do_mousepressed')

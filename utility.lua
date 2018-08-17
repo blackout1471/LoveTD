@@ -101,3 +101,7 @@ end
 function get2dRotation(x1, y1, x2, y2)
   return math.atan2(x2 - x1, y2 - y1) * 180 / math.pi
 end
+
+function setAlphaInTable(t_color, intAlpha)
+  return {t_color[1], t_color[2], t_color[3], intAlpha}
+end
