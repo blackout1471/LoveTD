@@ -16,7 +16,7 @@ Towers =
       projectileType  = '', -- What kind of projectile, to be fired
       cost            = 10,
       icon            = 'cannon_icon1', -- Menu icon, and also determines if it should be in menu, if not it's a upgrade
-      range           = 100, -- seen in pixels
+      range           = 50, -- seen in pixels
       size            = {w = 32, h = 32},
       renderType      = 'canon_1',
       parts           = {
@@ -104,7 +104,7 @@ function tower:setPosition(intX, intY)
   self.x    = intX
   self.y    = intY
   
-  self.bbox = {self.x - self.w, self.y - self.h, self.x + self.w, self.y + self.h}
+  self.bbox = {self.x - self.w/2, self.y - self.h/2, self.x + self.w/2, self.y + self.h/2}
   
   return true
 end

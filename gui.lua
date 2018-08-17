@@ -548,17 +548,6 @@ end
 
 --]]
 
-function isPointInsideBox (pX, pY, bX, bY, bX2, bY2)
-    if ((pX > bX)
-    and (pX < bX2)
-    and (pY > bY)
-    and (pY < bY2)) then
-        return true
-    end
-    
-    return false
-end
-
 function gui.Generic:setColor(t_color)
   self.color = t_color
   

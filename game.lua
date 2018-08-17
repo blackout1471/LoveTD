@@ -8,6 +8,9 @@
 local MapDir = '/maps/'
 local curObj = nil
 
+-- FOR TESTING
+local debug = true
+
 game = {}
 
 t_map = 
@@ -74,7 +77,16 @@ function game.loadMap(imageMap, mapName)
   -- load tower menu
   gameObj.menu = create_towerMenu()
   
+  --TEST--
+  gameCreateEnemies('red')
+  
 end
+
+--[[
+  
+  TOWER LOGIC
+
+--]]
 
 function gameCreateTower(x, y, strTower)
   -- Check if enough funds.
@@ -98,10 +110,54 @@ function gameCreateTower(x, y, strTower)
   return true
 end
 
-function tower_click(tower)
-  curObj = tower
-  print('clicked')
+function tower_click(tower, strButton)
+  if strButton == 1 then
+    curObj = tower
+  end
+  
+  if strButton == 2 then
+    if tower.isPlaced == false then
+      -- Destroy tower and get cash back
+      tower_destroy(tower)
+      local cash = gameObj.hud:getCash()
+      local towerCost = Towers[tower.towerType].cost
+      local cashBack = cash + towerCost
+      
+      gameObj.hud:setCash(cashBack)
+    end
+  end
+  
+  return curObj
 end
+
+function tower_destroy(towerObj)
+  for k, tower in ipairs(gameObj.towers) do
+    if tower == towerObj then
+      table.remove(gameObj.towers, k)
+      if curObj then curObj = nil end
+    end
+  end
+end
+
+--[[
+
+ENEMIES
+
+--]]
+
+function gameCreateEnemies(strEnemyType)
+  local enemy = create_enemy(strEnemyType)
+  table.insert(gameObj.enemies, enemy)
+  
+  enemy:setPosition(150, 400)
+  return true
+end
+
+--[[
+
+  HANDLERS
+
+--]]
 
 function game_do_draw()
   if gameObj then
@@ -116,13 +172,27 @@ function game_do_draw()
         -- Draw Tower Range
         love.graphics.setColor(tower.rangeColor)
         love.graphics.circle('fill', tower.x, tower.y, Towers[tower.towerType].range)
-        love.graphics.setColor(setAlphaInTable(Colors.white, 0.1))
-        love.graphics.rectangle('fill', tower.bbox[1], tower.bbox[2], tower.bbox[3]-tower.bbox[1], tower.bbox[4]-tower.bbox[2])
+        if debug then
+          love.graphics.setColor(setAlphaInTable(Colors.white, 0.1))
+          love.graphics.rectangle('fill', tower.bbox[1], tower.bbox[2], tower.bbox[3]-tower.bbox[1], tower.bbox[4]-tower.bbox[2]) -- SEE HITBOXES FOR TOWERS; JUST TESTING
+        end
       end
     end
-  end
   
   -- DRAW ENEMIES
+  
+    for _, enemies in ipairs(gameObj.enemies) do
+      love.graphics.setColor(Colors.white)
+      love.graphics.draw(enemies.skin, enemies.x, enemies.y, enemies.rot, enemies.scaleX, enemies.scaleY, enemies.w/2, enemies.h/2)
+      -- TEST DRAW enemies hitboxes
+      if debug then
+        love.graphics.setColor(setAlphaInTable(Colors.white, 0.2))
+        love.graphics.rectangle('fill', enemies.bbox[1], enemies.bbox[2], enemies.bbox[3]-enemies.bbox[1], enemies.bbox[4] - enemies.bbox[2])
+      end
+      
+    end
+  end
+
   
   -- DRAW PROJECTILES
 end
@@ -166,7 +236,7 @@ function game_do_mousepressed(intX, intY, strButton)
   -- Towers
   if strButton == 1 then
     if curObj then
-      -- Check if tower can be set
+      -- Check if tower can be set if true set it
       if curObj.canSet == true and curObj.isPlaced == false then
         curObj.isPlaced = true
         curObj = nil
@@ -180,6 +250,8 @@ function game_do_mousepressed(intX, intY, strButton)
       if tower.clickHandler then
         if (isPointInsideBox(intX, intY, unpack(tower.bbox))) then
           return _G[tower.clickHandler](tower, strButton, intX, intY)
+        else
+          curObj = nil
         end
       end
     end

@@ -94,6 +94,24 @@ function isPointInsidePolygon(x,y,poly)
 	return inside
 end
 
+function isPointInsideBox (pX, pY, bX, bY, bX2, bY2)
+    if ((pX > bX)
+    and (pX < bX2)
+    and (pY > bY)
+    and (pY < bY2)) then
+        return true
+    end
+    
+    return false
+end
+
+function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
+  return x1 < x2+w2 and
+         x2 < x1+w1 and
+         y1 < y2+h2 and
+         y2 < y1+h1
+end
+
 function get2dDistance(x1, y1, x2, y2)
   return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
 end
