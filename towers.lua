@@ -104,7 +104,7 @@ function tower:setPosition(intX, intY)
   self.x    = intX
   self.y    = intY
   
-  self.bbox = {self.x - self.w/2, self.y - self.h/2, self.x + self.w/2, self.y + self.h/2}
+  self.bbox = {self.x - self.w/2, self.y - self.h/2, self.x + self.w/2, self.y + self.h/2, self.x - self.w/2, self.y + self.h/2, self.x + self.w/2, self.y - self.h/2}
   
   return true
 end

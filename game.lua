@@ -77,14 +77,11 @@ function game.loadMap(imageMap, mapName)
   -- load tower menu
   gameObj.menu = create_towerMenu()
   
-  --TEST--
-  gameCreateEnemies('red')
-  
 end
 
 --[[
-  
-  TOWER LOGIC
+
+  Tower Logic
 
 --]]
 
@@ -95,7 +92,6 @@ function gameCreateTower(x, y, strTower)
   if cash >= towerCost and curObj == nil then
     gameObj.hud:setCash(cash-towerCost)
     local tower = create_tower(strTower)
-    tower.isPlaced = false
     tower.canSet   = false
     
     table.insert(gameObj.towers, tower)
@@ -103,6 +99,13 @@ function gameCreateTower(x, y, strTower)
     
     tower:setPosition(x, y)
     tower:setClickHandler('tower_click')
+    
+    --register handlers
+    registerGameCallBack('update', 'tower_place_update')
+    registerGameCallBack('mousepressed', 'tower_place_mousepressed')
+    
+    --deregisterGameCallBacks
+    deregisterGameCallBack('mousepressed', 'game_do_mousepressed')
   else
     -- print error for user, not enough funds
   end
@@ -110,46 +113,68 @@ function gameCreateTower(x, y, strTower)
   return true
 end
 
-function tower_click(tower, strButton)
-  if strButton == 1 then
-    curObj = tower
-  end
+function tower_place_update()
+  local mx, my = love.mouse.getPosition()
   
-  if strButton == 2 then
-    if tower.isPlaced == false then
-      -- Destroy tower and get cash back
-      tower_destroy(tower)
-      local cash = gameObj.hud:getCash()
-      local towerCost = Towers[tower.towerType].cost
-      local cashBack = cash + towerCost
-      
-      gameObj.hud:setCash(cashBack)
+  curObj:setPosition(mx, my)
+  
+  -- check if tower is inside deploy area
+  for k, poly in ipairs(t_map.area) do
+    if (isPointInsidePolygon(curObj.bbox[1], curObj.bbox[2], poly)) and (isPointInsidePolygon(curObj.bbox[3], curObj.bbox[4], poly)) and (isPointInsidePolygon(curObj.bbox[5], curObj.bbox[6], poly)) and (isPointInsidePolygon(curObj.bbox[7], curObj.bbox[8], poly)) then
+      curObj.rangeColor = setAlphaInTable(Colors.green, 0.2)
+      curObj.canSet = true
+      break
+    else
+      curObj.canSet = false
+      curObj.rangeColor = setAlphaInTable(Colors.red, 0.2)
     end
   end
   
-  return curObj
+  -- check to see if towers hit any other towers
+end
+
+function tower_place_mousepressed(intX, intY, strButton)
+  -- if tower can be set set it, and deregister the events
+  if strButton == 1 then 
+    if curObj.canSet == true then
+      deregisterGameCallBack('update', 'tower_place_update')
+      deregisterGameCallBack('mousepressed', 'tower_place_mousepressed')
+      registerGameCallBack('mousepressed', 'game_do_mousepressed')
+    end
+  elseif strButton == 2 then
+    
+    -- else destroy tower and get cash back
+    local cash = gameObj.hud:getCash()
+    local towerCost = Towers[curObj.towerType].cost
+    local cashBack = cash + towerCost
+    
+    gameObj.hud:setCash(cashBack)
+    tower_destroy(curObj)
+    
+    deregisterGameCallBack('update', 'tower_place_update')
+    deregisterGameCallBack('mousepressed', 'tower_place_mousepressed')
+    registerGameCallBack('mousepressed', 'game_do_mousepressed')
+  end
 end
 
 function tower_destroy(towerObj)
   for k, tower in ipairs(gameObj.towers) do
     if tower == towerObj then
       table.remove(gameObj.towers, k)
-      if curObj then curObj = nil end
+      curObj = nil
+      return true
     end
   end
 end
 
---[[
-
-ENEMIES
-
---]]
-
-function gameCreateEnemies(strEnemyType)
-  local enemy = create_enemy(strEnemyType)
-  table.insert(gameObj.enemies, enemy)
+-- activated when clicking on tower
+function tower_click(tower, strButton)
+  if strButton == 1 then
+    if not curObj then
+      curObj = tower
+    end
+  end
   
-  enemy:setPosition(150, 400)
   return true
 end
 
@@ -159,6 +184,7 @@ end
 
 --]]
 
+--DRAW
 function game_do_draw()
   if gameObj then
     
@@ -198,52 +224,11 @@ function game_do_draw()
 end
 registerGameCallBack('draw', 'game_do_draw')
 
--- GAME UPDATE
 
-function game_do_update()
-  local mx, my = love.mouse.getPosition()
-  
-  if gameObj then
-    
-    -- TOWERS
-    for k, tower in ipairs(gameObj.towers) do
-      if tower.isPlaced == false then
-        tower:setPosition(mx, my)
-        
-        -- Check if tower is inside the deploy area
-        for k, poly in ipairs(t_map.area) do
-          if (isPointInsidePolygon(tower.bbox[1], tower.bbox[2], poly)) and (isPointInsidePolygon(tower.bbox[3], tower.bbox[4], poly)) then
-            tower.rangeColor = setAlphaInTable(Colors.green, 0.2)
-            tower.canSet = true
-            break
-          else
-            tower.canSet = false
-            tower.rangeColor = setAlphaInTable(Colors.red, 0.2)
-          end
-        end
-      end
-    end
-    
-    -- Enemies
-    -- projectiles
-  end
-end
-registerGameCallBack('update', 'game_do_update')
 
--- GAME MOUSEPRESSED
+--MOUSE PRESSED
 
-function game_do_mousepressed(intX, intY, strButton)
-  -- Towers
-  if strButton == 1 then
-    if curObj then
-      -- Check if tower can be set if true set it
-      if curObj.canSet == true and curObj.isPlaced == false then
-        curObj.isPlaced = true
-        curObj = nil
-      end
-    end
-  end
-  
+function game_do_mousepressed(intX, intY, strButton)  
   -- Tower Click Handler
   if gameObj then
     for _, tower in ipairs(gameObj.towers) do
