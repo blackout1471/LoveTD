@@ -116,9 +116,7 @@ function get2dDistance(x1, y1, x2, y2)
   return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
 end
 
-function get2dRotation(x1, y1, x2, y2)
-  return math.atan2(x2 - x1, y2 - y1) * 180 / math.pi
-end
+function get2dAngle(x1,y1, x2,y2) return math.atan2(y2-y1, x2-x1) + math.rad(90) end
 
 function setAlphaInTable(t_color, intAlpha)
   return {t_color[1], t_color[2], t_color[3], intAlpha}

@@ -10,7 +10,8 @@ local files =
     'towers',
     'enemies',
     'hud',
-    'level'
+    'level',
+    'projectiles'
 }
 
 local t_Callbacks = 

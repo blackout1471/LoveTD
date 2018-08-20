@@ -65,14 +65,17 @@ function game.loadMap(imageMap, mapName)
   end
   
   -- load default settings, and register gameCallBacks
-  gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}}
-  gameVar = {lives = 100, cash = 100, wave = 0, spawnTick = 0}
+  gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}, projectiles = {}}
+  gameVar = {lives = 100, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
   
   -- load hud
   gameObj.hud = hud_createHUD()
   gameObj.hud:setCash(gameVar.cash)
   gameObj.hud:setHealth(gameVar.lives)
   gameObj.hud:setCurWave(gameVar.wave)
+  local mapName = t_map.name:sub(1, #t_map.name-4):lower()
+  local maxWaves = level_get_max_waves(mapName)
+  gameObj.hud:setMaxWave(maxWaves)
   
   -- load tower menu
   gameObj.menu = create_towerMenu()
@@ -124,6 +127,7 @@ function tower_place_update()
   local mx, my = love.mouse.getPosition()
   
   curObj:setPosition(mx, my)
+  curObj.canAttack = false
   
   -- check if tower is inside deploy area
   for k, poly in ipairs(t_map.area) do
@@ -155,6 +159,7 @@ function tower_place_mousepressed(intX, intY, strButton)
       deregisterGameCallBack('update', 'tower_place_update')
       deregisterGameCallBack('mousepressed', 'tower_place_mousepressed')
       registerGameCallBack('mousepressed', 'game_do_mousepressed')
+      curObj.canAttack = true
     end
   elseif strButton == 2 then
     
@@ -193,6 +198,28 @@ function tower_click(tower, strButton)
   return true
 end
 
+function tower_attackEnemies_update(dt)
+  for k, tower in ipairs(gameObj.towers) do
+  -- get target if tower have none
+    tower.target = tower:getTarget(gameObj.enemies) or nil
+    -- rotate to target
+    if tower.target then
+      tower:setRotation(get2dAngle(tower.x, tower.y, tower.target.x, tower.target.y))
+      if tower.canAttack then
+        tower:attack(tower.target)
+      end
+    end
+  end
+  -- get Projectiles to fly if hits target, targets lose health
+  for k, projectile in ipairs(gameObj.projectiles) do
+    projectile:getToTarget(dt)
+    if CheckCollision(projectile.x, projectile.y, projectile.w, projectile.h, projectile.target.x, projectile.target.y, projectile.target.w/2, projectile.target.h/2) then
+      table.remove(gameObj.projectiles, k)
+      projectile.target.health = projectile.target.health - projectile.damage
+    end
+  end
+end
+
 --[[
 
   Enemy Logic
@@ -213,6 +240,7 @@ function gameQueueEnemies()
     obj.enemy = nextWave.enemyType
     obj.interval = nextWave.interval
     table.insert(gameObj.enemyQueue, obj)
+    gameVar.enemyCounter = gameVar.enemyCounter + 1
   end
   
   return true
@@ -238,36 +266,53 @@ end
 
 function gameEnemiesMove_update(dt)
   for k, enemy in ipairs(gameObj.enemies) do
-    local enemyNode = enemy.node
-    local curNode = t_map.path[1][enemyNode]
-    local nextNode = t_map.path[1][enemyNode + 1]
-    local speed = t_enemies[enemy.enemyType].speed
-    local nodeDistance = get2dDistance(curNode.x, curNode.y, nextNode.x, nextNode.y)
-    
-    local enemy_vx, enemy_vy = (nextNode.x - curNode.x) / nodeDistance * speed, (nextNode.y - curNode.y) / nodeDistance * speed
-    
-    local enemyX, enemyY = enemy.x + enemy_vx * dt, enemy.y + enemy_vy * dt
-    
-    enemy:setPosition(enemyX, enemyY)
-    
-    -- Check if enemy has reached destination if it has set next node
-    local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
-    print(math.floor(distanceToTarget))
-    
-    if math.floor(distanceToTarget) == 0 then 
-      if nextNode == #t_map.path[1] then
+    if enemy.node ~= table.getn(t_map.path[1]) then
+      local enemyNode = enemy.node
+      local curNode = t_map.path[1][enemyNode]
+      local nextNode = t_map.path[1][enemyNode + 1]
+      local speed = t_enemies[enemy.enemyType].speed
+      local nodeDistance = get2dDistance(curNode.x, curNode.y, nextNode.x, nextNode.y)
+      
+      local enemy_vx, enemy_vy = (nextNode.x - curNode.x) / nodeDistance * speed, (nextNode.y - curNode.y) / nodeDistance * speed
+      
+      local enemyX, enemyY = enemy.x + enemy_vx * dt, enemy.y + enemy_vy * dt
+      
+      enemy:setPosition(enemyX, enemyY)
+      
+      -- get rotation and set
+      local rot = get2dAngle(curNode.x,curNode.y, nextNode.x, nextNode.y)
+      enemy:setRotation(rot)
+      
+      -- Check if enemy has reached destination if it has set next node
+      local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
+      
+      if math.floor(distanceToTarget) < 1 and math.floor(distanceToTarget) > -1 then enemy.node = enemy.node + 1 end
+      
+      -- check and see if enemies are dead if they are get money
+      if enemy.health <= 0 then
         table.remove(gameObj.enemies, k)
-      else
-        enemy.node = enemy.node + 1
+        local curCash = gameObj.hud:getCash()
+        curCash = curCash + enemy:getCashBack()
+        gameObj.hud:setCash(curCash)
+        gameVar.enemyCounter = gameVar.enemyCounter -1
       end
+    
+    else
+      -- remove enemy and lose 1 health
+      table.remove(gameObj.enemies, k)
+      gameVar.lives = gameVar.lives - 1
+      gameObj.hud:setHealth(gameVar.lives)
+      gameVar.enemyCounter = gameVar.enemyCounter - 1
     end
-    
-    print(#t_map.path[1], nextNode)
-   
-    
-    
+  end
+  -- if there is no more enemies deregister event
+  if (next(gameObj.enemies) == nil and gameVar.enemyCounter == 0) then
+    gameObj.hud:HideReady(false)
+    deregisterGameCallBack('update', 'gameEnemiesMove_update')
+    deregisterGameCallBack('update', 'tower_attackEnemies_update')
   end
 end
+
 
 --[[
 
@@ -312,6 +357,10 @@ function game_do_draw()
 
   
   -- DRAW PROJECTILES
+  for _, projectiles in ipairs(gameObj.projectiles) do
+    projectiles:render()
+  end
+  
 end
 
 
@@ -338,7 +387,7 @@ end
 function game_do_keyPressed(key, scanCode, isKeyRepeat)
   -- check if a wave is in progress
   if key == 'space' then
-    if next(gameObj.enemies) == nil then
+    if next(gameObj.enemies) == nil and gameVar.enemyCounter == 0 then
       
       -- check if not current wave is last
       local curWave = gameObj.hud:getCurWave()
@@ -347,11 +396,17 @@ function game_do_keyPressed(key, scanCode, isKeyRepeat)
       if curWave ~= lastWave then
         -- queue and spawn enemies
         gameQueueEnemies()
+        
+        -- Register Game Logic
         registerGameCallBack('update', 'gameSpawnEnemies_update')
-        -- register Enemy logic
         registerGameCallBack('update', 'gameEnemiesMove_update')
+        registerGameCallBack('update', 'tower_attackEnemies_update')
+        
         gameVar.wave = curWave + 1
         gameObj.hud:setCurWave(gameVar.wave)
+        -- hide ready label
+        gameObj.hud:HideReady(true)
+        
       end
     end
   end

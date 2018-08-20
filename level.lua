@@ -15,8 +15,12 @@ Level =
 {
   map1 = 
   {
-    {enemyType = 'red', interval = 2, amount = 1},
-    {enemyType = 'red', interval = 2, amount = 10},
-    {enemyType = 'red', interval = 2, amount = 10}
+    {enemyType = 'red', interval = 1, amount = 5},
+    {enemyType = 'red', interval = 2, amount = 3},
+    {enemyType = 'red', interval = 2, amount = 1}
   }
 }
+
+function level_get_max_waves(strMap)
+  return table.getn(Level[strMap])
+end

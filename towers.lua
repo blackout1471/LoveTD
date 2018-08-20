@@ -13,7 +13,7 @@ Towers =
       aoe             = 0, -- area of effect, the area the projectile will reach.
       rps             = 1, -- round per second
       damage          = 5,
-      projectileType  = '', -- What kind of projectile, to be fired
+      projectileType  = 'cannon', -- What kind of projectile, to be fired
       cost            = 10,
       icon            = 'cannon_icon1', -- Menu icon, and also determines if it should be in menu, if not it's a upgrade
       range           = 50, -- seen in pixels
@@ -79,9 +79,11 @@ function create_tower(strType)
   obj.w           = Towers[strType].size.w
   obj.h           = Towers[strType].size.h
   obj.rot         = 0
+  obj.target      = nil
   obj.rangeColor  = setAlphaInTable(Colors.green, 0.2)
   obj.scaleX      = 1
   obj.scaleY      = 1
+  obj.tick        = 1
   obj.imgBase     = love.graphics.newImage(towerImgDir .. Towers[strType].parts.base.skin)
   obj.imgTop      = love.graphics.newImage(towerImgDir .. Towers[strType].parts.top.skin)
   obj.bbox        = {obj.x, obj.y, obj.x + obj.w, obj.y + obj.h}
@@ -130,8 +132,32 @@ function tower:setScale(intScaleX, intScaleY)
   return true
 end
 
+function tower:getProjectile()
+  return Towers[self.towerType].projectileType
+end
+
 function tower:setClickHandler(strFunc)
   self.clickHandler = strFunc
   
   return true
+end
+
+function tower:getTarget(t_enemy)
+  for k, enemy in ipairs(t_enemy) do
+    local distToTarget = get2dDistance(self.x + self.w/2, self.y + self.h/2, enemy.x + enemy.w/2, enemy.y + enemy.h/2)
+    local range = Towers[self.towerType].range
+    if distToTarget <= range then
+      return enemy
+    end
+  end
+  return nil
+end
+
+function tower:attack(targetObj)
+  local tick = getTime()
+  local attackRate = Towers[self.towerType].rps
+  if ((tick - self.tick) >= 1 / attackRate) then
+    table.insert(gameObj.projectiles, createProjectile(self.x, self.y, self:getProjectile(), targetObj, Towers[self.towerType].damage))
+    self.tick = tick
+  end
 end

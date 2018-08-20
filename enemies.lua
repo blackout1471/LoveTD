@@ -36,10 +36,11 @@ function create_enemy(strEnemyType)
   obj.y         = 0
   obj.w         = t_enemies[strEnemyType].size[1]
   obj.h         = t_enemies[strEnemyType].size[2]
-  obj.rot       = 0
+  obj.rot       = 90
   obj.scaleX    = 1
   obj.scaleY    = 1
   obj.node      = 1
+  obj.health    = t_enemies[strEnemyType].health
   obj.skin      = love.graphics.newImage(imgDir .. t_enemies[strEnemyType].skin)
   obj.bbox      = {obj.x, obj.y, obj.x + obj.w, obj.y + obj.h}
   
@@ -87,4 +88,8 @@ end
 
 function enemies:getRotation()
   return self.rot
+end
+
+function enemies:getCashBack()
+  return t_enemies[self.enemyType].cash
 end

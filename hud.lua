@@ -28,6 +28,9 @@ function hud_createHUD()
   bar.cashLabel     = gui.createLabel(bar.bg.x+10, bar.bg.y+20, '$:', Colors.white, 'Maps')
   bar.healthLabel   = gui.createLabel(bar.bg.x+100, bar.bg.y+20, 'Lives:', Colors.white, 'Maps')
   
+  bar.readyLabel    = gui.createLabel(0, 200, 'Ready to spawn next wave!', Colors.green, 'Buttons')
+  bar.readyLabel:centerX()
+  
   
   bar.curWaveLabel  = gui.createLabel(bar.bg.x+185, bar.bg.y+20, '0', Colors.white, 'Maps')
   bar.maxWaveLabel  = gui.createLabel(bar.bg.x+200, bar.bg.y+20, '/20', Colors.white, 'Maps')
@@ -49,6 +52,10 @@ end
 
 function hud:setCash(intCash)
   return self.bar.cashLabel:setText('$:' .. tostring(intCash))
+end
+
+function hud:HideReady(boolHidden)
+  return self.bar.readyLabel:setHidden(boolHidden)
 end
 
 function hud:getCash()
@@ -75,7 +82,7 @@ function hud:getCurWave()
 end
 
 function hud:setMaxWave(intMaxWave)
-  return self.bar.maxWaveLabel:setText(tostring(intMaxWave))
+  return self.bar.maxWaveLabel:setText('/' .. tostring(intMaxWave))
 end
 
 function hud:getMaxWaves()
