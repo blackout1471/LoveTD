@@ -65,8 +65,8 @@ function game.loadMap(imageMap, mapName)
   end
   
   -- load default settings, and register gameCallBacks
-  gameObj = {towers = {}, enemies = {}, hud = {}, menu = {}}
-  gameVar = {lives = 100, cash = 100, wave = 0}
+  gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}}
+  gameVar = {lives = 100, cash = 100, wave = 0, spawnTick = 0}
   
   -- load hud
   gameObj.hud = hud_createHUD()
@@ -76,6 +76,13 @@ function game.loadMap(imageMap, mapName)
   
   -- load tower menu
   gameObj.menu = create_towerMenu()
+  
+  -- registerCallBacks
+  registerGameCallBack('keypressed', 'game_do_keyPressed')
+  registerGameCallBack('mousepressed', 'game_do_mousepressed')
+  registerGameCallBack('draw', 'game_do_draw')
+  
+  return true
   
 end
 
@@ -131,6 +138,14 @@ function tower_place_update()
   end
   
   -- check to see if towers hit any other towers
+  for k, tower in ipairs(gameObj.towers) do
+    if curObj ~= tower then
+      if (CheckCollision(curObj.x, curObj.y, curObj.w, curObj.h, tower.x, tower.y, tower.w, tower.h)) then
+        curObj.canSet = false
+        curObj.rangeColor = setAlphaInTable(Colors.red, 0.2)
+      end
+    end
+  end
 end
 
 function tower_place_mousepressed(intX, intY, strButton)
@@ -180,6 +195,82 @@ end
 
 --[[
 
+  Enemy Logic
+
+--]]
+
+function gameQueueEnemies()
+  -- get startNode and mapName and look for next wave
+  local mapName = t_map.name:sub(1, #t_map.name-4):lower()
+  
+  local curWave = gameObj.hud:getCurWave()
+  local nextWave = Level[mapName][curWave+1]
+  
+  -- Queue enemies to get spawned
+  
+  for i=0, nextWave.amount-1 do
+    local obj = {}
+    obj.enemy = nextWave.enemyType
+    obj.interval = nextWave.interval
+    table.insert(gameObj.enemyQueue, obj)
+  end
+  
+  return true
+end
+
+function gameSpawnEnemies_update(dt)
+  local startX, startY = t_map.path[1][1].x, t_map.path[1][1].y
+  -- spawn after delay
+  local tick = getTime()
+  if next(gameObj.enemyQueue) ~= nil then
+    local curEnemy = gameObj.enemyQueue[1]
+    if ((tick - gameVar.spawnTick) >= curEnemy.interval) then
+      local enemy = create_enemy(curEnemy.enemy)
+      table.insert(gameObj.enemies, enemy)
+      enemy:setPosition(startX, startY)
+      table.remove(gameObj.enemyQueue, 1)
+      gameVar.spawnTick = tick
+    end
+  else
+    deregisterGameCallBack('update', 'gameSpawnEnemies_update')
+  end
+end
+
+function gameEnemiesMove_update(dt)
+  for k, enemy in ipairs(gameObj.enemies) do
+    local enemyNode = enemy.node
+    local curNode = t_map.path[1][enemyNode]
+    local nextNode = t_map.path[1][enemyNode + 1]
+    local speed = t_enemies[enemy.enemyType].speed
+    local nodeDistance = get2dDistance(curNode.x, curNode.y, nextNode.x, nextNode.y)
+    
+    local enemy_vx, enemy_vy = (nextNode.x - curNode.x) / nodeDistance * speed, (nextNode.y - curNode.y) / nodeDistance * speed
+    
+    local enemyX, enemyY = enemy.x + enemy_vx * dt, enemy.y + enemy_vy * dt
+    
+    enemy:setPosition(enemyX, enemyY)
+    
+    -- Check if enemy has reached destination if it has set next node
+    local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
+    print(math.floor(distanceToTarget))
+    
+    if math.floor(distanceToTarget) == 0 then 
+      if nextNode == #t_map.path[1] then
+        table.remove(gameObj.enemies, k)
+      else
+        enemy.node = enemy.node + 1
+      end
+    end
+    
+    print(#t_map.path[1], nextNode)
+   
+    
+    
+  end
+end
+
+--[[
+
   HANDLERS
 
 --]]
@@ -222,7 +313,6 @@ function game_do_draw()
   
   -- DRAW PROJECTILES
 end
-registerGameCallBack('draw', 'game_do_draw')
 
 
 
@@ -243,4 +333,26 @@ function game_do_mousepressed(intX, intY, strButton)
   end
   
 end
-registerGameCallBack('mousepressed', 'game_do_mousepressed')
+
+-- Keyboard pressed
+function game_do_keyPressed(key, scanCode, isKeyRepeat)
+  -- check if a wave is in progress
+  if key == 'space' then
+    if next(gameObj.enemies) == nil then
+      
+      -- check if not current wave is last
+      local curWave = gameObj.hud:getCurWave()
+      local lastWave = gameObj.hud:getMaxWaves()
+      
+      if curWave ~= lastWave then
+        -- queue and spawn enemies
+        gameQueueEnemies()
+        registerGameCallBack('update', 'gameSpawnEnemies_update')
+        -- register Enemy logic
+        registerGameCallBack('update', 'gameEnemiesMove_update')
+        gameVar.wave = curWave + 1
+        gameObj.hud:setCurWave(gameVar.wave)
+      end
+    end
+  end
+end

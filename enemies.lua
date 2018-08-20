@@ -10,7 +10,7 @@ t_enemies = {
     ['red'] = 
     {
       health  = 20,
-      speed   = 1, -- speed per frame
+      speed   = 50, -- pixels per frame
       skin    = 'red1.png',
       size    = {32, 32},
       cash    = 1
@@ -39,6 +39,7 @@ function create_enemy(strEnemyType)
   obj.rot       = 0
   obj.scaleX    = 1
   obj.scaleY    = 1
+  obj.node      = 1
   obj.skin      = love.graphics.newImage(imgDir .. t_enemies[strEnemyType].skin)
   obj.bbox      = {obj.x, obj.y, obj.x + obj.w, obj.y + obj.h}
   

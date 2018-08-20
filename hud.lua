@@ -29,7 +29,7 @@ function hud_createHUD()
   bar.healthLabel   = gui.createLabel(bar.bg.x+100, bar.bg.y+20, 'Lives:', Colors.white, 'Maps')
   
   
-  bar.curWaveLabel  = gui.createLabel(bar.bg.x+190, bar.bg.y+20, '0', Colors.white, 'Maps')
+  bar.curWaveLabel  = gui.createLabel(bar.bg.x+185, bar.bg.y+20, '0', Colors.white, 'Maps')
   bar.maxWaveLabel  = gui.createLabel(bar.bg.x+200, bar.bg.y+20, '/20', Colors.white, 'Maps')
   
   setmetatable(obj, hud.mt)
@@ -79,7 +79,7 @@ function hud:setMaxWave(intMaxWave)
 end
 
 function hud:getMaxWaves()
-  return tonumber(self.bar.maxWaveLabel:getText())
+  return tonumber(self.bar.maxWaveLabel:getText():sub(2, #self.bar.maxWaveLabel:getText()))
 end
 
 
