@@ -13,6 +13,12 @@ t_projectiles = {
       speed = 100, -- pixels pr second
       amount = 1, -- the amount of shots to produce
       size = {10, 10}
+    },
+    ['laser'] = {
+        skin = 'laser_shot.png',
+        speed = 300,
+        amount = 1,
+        size = {10, 5}
     }
 }
 

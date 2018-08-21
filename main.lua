@@ -13,6 +13,14 @@ local files =
     'level',
     'projectiles'
 }
+counter = 0
+
+for k, file in ipairs(files) do
+  for _ in io.lines (file .. '.lua') do
+    counter = counter + 1
+  end
+end
+print(counter)
 
 local t_Callbacks = 
 {

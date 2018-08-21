@@ -32,10 +32,10 @@ Towers =
       aoe             = 0,
       rps             = 4,
       damage          = 2,
-      projectileType  = '',
+      projectileType  = 'laser',
       cost            = 20,
       icon            = '', -- make
-      range           = 40,
+      range           = 100,
       size            = {w = 32, h = 32},
       renderType      = 'laser_1',
       parts           = {

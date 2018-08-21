@@ -15,9 +15,15 @@ Level =
 {
   map1 = 
   {
-    {enemyType = 'red', interval = 1, amount = 5},
-    {enemyType = 'red', interval = 2, amount = 3},
-    {enemyType = 'red', interval = 2, amount = 1}
+    {enemyType = 'red', interval = 1, amount = 1},
+    {enemyType = 'red', interval = 2, amount = 20},
+    {enemyType = 'red', interval = 2, amount = 10}
+  },
+  spire =
+  {
+    {enemyType = 'red', interval = 1, amount = 300},
+    {enemyType = 'red', interval = 2, amount = 20},
+    {enemyType = 'red', interval = 2, amount = 10}  
   }
 }
 

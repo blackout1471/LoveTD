@@ -286,7 +286,8 @@ function gameEnemiesMove_update(dt)
       -- Check if enemy has reached destination if it has set next node
       local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
       
-      if math.floor(distanceToTarget) < 1 and math.floor(distanceToTarget) > -1 then enemy.node = enemy.node + 1 end
+      if distanceToTarget < 3 then enemy.node = enemy.node + 1 end
+      print(math.floor(distanceToTarget))
       
       -- check and see if enemies are dead if they are get money
       if enemy.health <= 0 then
