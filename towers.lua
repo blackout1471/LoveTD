@@ -1,7 +1,8 @@
 t_towerList = 
 {
   'cannon',
-  'laser'
+  'laser',
+  'flamethrower'
 }
 
 Towers = 
@@ -41,6 +42,25 @@ Towers =
       parts           = {
                           base  = {skin = 'laser_base1.png'},
                           top   = {skin = 'laser_top1.png'}
+                        }
+      
+    },
+    ['flamethrower'] =
+    {
+      name            = 'Flamethrower',
+      description     = 'If you like your chickens grilled, this is the tower for you.',
+      aoe             = 3,
+      rps             = 20,
+      damage          = 0.75,
+      projectileType  = 'flame',
+      cost            = 40,
+      icon            = '', -- make
+      range           = 60,
+      size            = {w = 32, h = 32},
+      renderType      = 'flame_1',
+      parts           = {
+                          base  = {skin = 'Flame_Base1.png'},
+                          top   = {skin = 'Flame_Top1.png'}
                         }
       
     }

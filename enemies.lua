@@ -14,6 +14,38 @@ t_enemies = {
       skin    = 'red1.png',
       size    = {32, 32},
       cash    = 1
+    },
+    ['boss'] = 
+    {
+      health  = 200,
+      speed   = 30, -- pixels per frame
+      skin    = 'boss1.png',
+      size    = {32, 32},
+      cash    = 30
+    },
+    ['starter'] = 
+    {
+      health  = 5,
+      speed   = 50, -- pixels per frame
+      skin    = 'starter_mob.png',
+      size    = {16, 16},
+      cash    = 1
+    },
+    ['starter1'] = 
+    {
+      health  = 10,
+      speed   = 50, -- pixels per frame
+      skin    = 'starter_mob1.png',
+      size    = {16, 16},
+      cash    = 2
+    },
+    ['starterfast'] = 
+    {
+      health  = 5,
+      speed   = 100, -- pixels per frame
+      skin    = 'starter_mobfast.png',
+      size    = {16, 16},
+      cash    = 3
     }
 }
 
