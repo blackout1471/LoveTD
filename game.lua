@@ -65,7 +65,7 @@ function game.loadMap(imageMap, mapName)
   end
   
   -- load default settings, and register gameCallBacks
-  gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}, projectiles = {}}
+  gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}, projectiles = {}, upgradeMenu = {}}
   gameVar = {lives = 100, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
   
   -- load hud
@@ -192,10 +192,34 @@ function tower_click(tower, strButton)
   if strButton == 1 then
     if not curObj then
       curObj = tower
+      
+      -- Open upgrade menu
+      tower_openUpgradeMenu(curObj)
     end
   end
   
   return true
+end
+
+function tower_openUpgradeMenu(tower)
+  local mx, my = love.mouse.getPosition()
+  local sizeX, sizeY = 150, 200
+  local pos = {mx + 10, my - sizeX/2}
+  
+  local t_inf = Towers[tower.towerType]
+  
+  gameObj.upgradeMenu['rectangle']  = gui.createRectangle(pos[1], pos[2], sizeX, sizeY, Colors.grey)
+  gameObj.upgradeMenu['text']       = gui.createLabel(pos[1], pos[2], string.format('%s\n\nDesc:%s\n\nRPS: %s\n\nDmg: %s', t_inf.name, t_inf.description, t_inf.rps, t_inf.damage), Colors.white, 'Maps')
+  gameObj.upgradeMenu['text']:setWrapLimit(90)
+  gameObj.upgradeMenu['removeBtn']  = gui.createButton(pos[1] + 5, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Remove', Colors.lightGrey, Colors.white, 'TowerMenu')
+  gameObj.upgradeMenu['upgradeBtn'] = gui.createButton(pos[1] + 10 + 70, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Upragde', Colors.lightGrey, Colors.white, 'TowerMenu')
+end
+
+function tower_destroyUpgradeMenu()
+  for k ,menu in pairs(gameObj.upgradeMenu) do
+    menu:destroy()
+    gameObj.upgradeMenu[k] = nil
+  end
 end
 
 function tower_attackEnemies_update(dt)
@@ -287,7 +311,6 @@ function gameEnemiesMove_update(dt)
       local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
       
       if distanceToTarget < 3 then enemy.node = enemy.node + 1 end
-      print(math.floor(distanceToTarget))
       
       -- check and see if enemies are dead if they are get money
       if enemy.health <= 0 then
@@ -376,6 +399,7 @@ function game_do_mousepressed(intX, intY, strButton)
         if (isPointInsideBox(intX, intY, unpack(tower.bbox))) then
           return _G[tower.clickHandler](tower, strButton, intX, intY)
         else
+          tower_destroyUpgradeMenu()
           curObj = nil
         end
       end
