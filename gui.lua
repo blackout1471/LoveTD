@@ -124,6 +124,7 @@ function gui.Buttons:destroy() -- Destroy button
   self = nil
 end
 
+
 function gui.Buttons:setText(strText)
   self.text   = strText
   self.textX  = self.x + (self.w/2) - self.font:getWidth(strText)/2

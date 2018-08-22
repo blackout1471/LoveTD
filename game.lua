@@ -215,6 +215,7 @@ function tower_openUpgradeMenu(tower)
   gameObj.upgradeMenu['upgradeBtn'] = gui.createButton(pos[1] + 10 + 70, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Upragde', Colors.lightGrey, Colors.white, 'TowerMenu')
 end
 
+
 function tower_destroyUpgradeMenu()
   for k ,menu in pairs(gameObj.upgradeMenu) do
     menu:destroy()
