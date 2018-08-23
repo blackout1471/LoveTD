@@ -66,7 +66,7 @@ function game.loadMap(imageMap, mapName)
   
   -- load default settings, and register gameCallBacks
   gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}, projectiles = {}, upgradeMenu = {}}
-  gameVar = {lives = 100, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
+  gameVar = {lives = 1, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
   
   -- load hud
   gameObj.hud = hud_createHUD()
@@ -204,15 +204,51 @@ end
 function tower_openUpgradeMenu(tower)
   local mx, my = love.mouse.getPosition()
   local sizeX, sizeY = 150, 200
-  local pos = {mx + 10, my - sizeX/2}
+  local pos = {0, love.graphics.getHeight() - sizeY}
   
   local t_inf = Towers[tower.towerType]
   
   gameObj.upgradeMenu['rectangle']  = gui.createRectangle(pos[1], pos[2], sizeX, sizeY, Colors.grey)
   gameObj.upgradeMenu['text']       = gui.createLabel(pos[1], pos[2], string.format('%s\n\nDesc:%s\n\nRPS: %s\n\nDmg: %s', t_inf.name, t_inf.description, t_inf.rps, t_inf.damage), Colors.white, 'Maps')
   gameObj.upgradeMenu['text']:setWrapLimit(90)
-  gameObj.upgradeMenu['removeBtn']  = gui.createButton(pos[1] + 5, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Remove', Colors.lightGrey, Colors.white, 'TowerMenu')
+  gameObj.upgradeMenu['sellBtn']  = gui.createButton(pos[1] + 5, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Sell', Colors.lightGrey, Colors.white, 'TowerMenu')
+  gameObj.upgradeMenu['sellBtn']:setClickHandler('tower_sellBtnClick')
   gameObj.upgradeMenu['upgradeBtn'] = gui.createButton(pos[1] + 10 + 70, (pos[2] + sizeY) - 25, (sizeX/2)-10, 20, 'Upragde', Colors.lightGrey, Colors.white, 'TowerMenu')
+  gameObj.upgradeMenu['upgradeBtn']:setClickHandler('tower_upgradeBtnClick')
+end
+
+function tower_upgradeBtnClick()
+  -- check found if, if user have enough upgrade, else give error
+  local curCash = gameObj.hud:getCash()
+  if (Towers[curObj.towerType .. curObj.level+1]) then
+    if (curCash >= Towers[curObj.towerType .. curObj.level+1].cost) then
+      local oldTower = curObj
+      local newTower = create_tower(curObj.towerType .. curObj.level+1)
+      
+      table.insert(gameObj.towers, newTower)
+      
+      newTower:setPosition(oldTower.x, oldTower.y)
+      newTower:setClickHandler('tower_click')
+      
+      tower_destroy(curObj) -- destroy tower
+      tower_destroyUpgradeMenu() -- destroy menu
+      
+      return true
+    end
+  end
+  
+  return false
+end
+
+function tower_sellBtnClick()
+  -- check what the tower cost, and get 80%, and destroy menu
+  local curCash = gameObj.hud:getCash()
+  local cashBack = curCash + (Towers[curObj.towerType].cost)*0.8
+  tower_destroy(curObj) -- destroy tower
+  gameObj.hud:setCash(cashBack)
+  tower_destroyUpgradeMenu()
+  
+  return true
 end
 
 
@@ -298,10 +334,18 @@ function gameEnemiesMove_update(dt)
       local speed = t_enemies[enemy.enemyType].speed
       local nodeDistance = get2dDistance(curNode.x, curNode.y, nextNode.x, nextNode.y)
       
-      local enemy_vx, enemy_vy = (nextNode.x - curNode.x) / nodeDistance * speed, (nextNode.y - curNode.y) / nodeDistance * speed
+      -- Get distance in time, pixels pr frame
+      local pathTime = nodeDistance / speed
       
-      local enemyX, enemyY = enemy.x + enemy_vx * dt, enemy.y + enemy_vy * dt
+      -- Get progress for enemy in time
+      enemy.t = enemy.t + dt / pathTime
+      enemy.t = math.min(enemy.t, 1)
       
+      -- Get where the enemy is on the line, by calculating how much time have passed
+      local enemyX = curNode.x + (nextNode.x - curNode.x) * enemy.t
+      local enemyY = curNode.y + (nextNode.y - curNode.y) * enemy.t
+      
+      -- and place enemy
       enemy:setPosition(enemyX, enemyY)
       
       -- get rotation and set
@@ -309,9 +353,10 @@ function gameEnemiesMove_update(dt)
       enemy:setRotation(rot)
       
       -- Check if enemy has reached destination if it has set next node
-      local distanceToTarget = get2dDistance(nextNode.x, nextNode.y, enemyX, enemyY)
-      
-      if distanceToTarget < 3 then enemy.node = enemy.node + 1 end
+      if enemy.t == 1 then
+        enemy.node = enemy.node + 1
+        enemy.t = 0
+      end
       
       -- check and see if enemies are dead if they are get money
       if enemy.health <= 0 then
@@ -323,16 +368,27 @@ function gameEnemiesMove_update(dt)
       end
     
     else
-      -- remove enemy and lose 1 health
-      table.remove(gameObj.enemies, k)
-      gameVar.lives = gameVar.lives - 1
-      gameObj.hud:setHealth(gameVar.lives)
-      gameVar.enemyCounter = gameVar.enemyCounter - 1
+      -- If enemy reaches the end, then check if last health or else lose 1 life
+      if gameVar.lives ~= 1 then
+        -- remove enemy and lose 1 health
+        table.remove(gameObj.enemies, k)
+        gameVar.lives = gameVar.lives - 1
+        gameObj.hud:setHealth(gameVar.lives)
+        gameVar.enemyCounter = gameVar.enemyCounter - 1
+      else
+        gameVar.lives = gameVar.lives - 1
+        gameObj.hud:setHealth(gameVar.lives)
+        gameObj.projectiles = {}
+        gameObj.enemies     = {}
+        gameVar.enemyCounter = 0
+        gameObj.hud:setText("You Lost!")
+      end
     end
   end
   -- if there is no more enemies deregister event
   if (next(gameObj.enemies) == nil and gameVar.enemyCounter == 0) then
     gameObj.hud:HideReady(false)
+    gameObj.projectiles = {}
     deregisterGameCallBack('update', 'gameEnemiesMove_update')
     deregisterGameCallBack('update', 'tower_attackEnemies_update')
   end

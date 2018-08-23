@@ -82,6 +82,25 @@ Towers =
                           top   = {skin = 'Flame_Top1.png'}
                         }
       
+    },
+    ['laser2'] = --TEST FOR AN UPGRADE
+    {
+      name            = 'Cannon', -- Name that will be displayed in menu
+      description     = 'Cannon that shoots balls as big as watermelons, As efficient as it is expensive.', -- description
+      aoe             = 0, -- area of effect, the area the projectile will reach.
+      rps             = 1, -- round per second
+      damage          = 5,
+      projectileType  = 'cannon', -- What kind of projectile, to be fired
+      cost            = 30,
+      icon            = 'cannon_icon1', -- Menu icon, and also determines if it should be in menu, if not it's a upgrade
+      range           = 50, -- seen in pixels
+      size            = {w = 32, h = 32},
+      renderType      = 'canon_1',
+      parts           = {
+                          base = {skin = 'cannon_base1.png'},
+                          top  = {skin = 'cannon_top1.png'}
+                        }
+      
     }
 }
 
@@ -114,6 +133,7 @@ function create_tower(strType)
   local obj = {}
   obj.towerType   = strType
   obj.x           = 0
+  obj.level       = 1
   obj.y           = 0
   obj.w           = Towers[strType].size.w
   obj.h           = Towers[strType].size.h

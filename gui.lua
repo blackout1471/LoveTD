@@ -625,3 +625,14 @@ function gui_DoHoverHandler()
     return true
 end
 registerGameCallBack('update', 'gui_DoHoverHandler')
+
+function gui_remove_all()
+  for k, gui in ipairs(gui.objects) do
+    if curGuiHoverObject == gui then
+      curGuiHoverObject = nil
+    end
+    
+    table.remove(gui.objects, k)
+  end
+  return true
+end

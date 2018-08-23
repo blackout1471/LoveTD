@@ -58,6 +58,10 @@ function hud:HideReady(boolHidden)
   return self.bar.readyLabel:setHidden(boolHidden)
 end
 
+function hud:setText(strText)
+  return self.bar.readyLabel:setText(strText)
+end
+
 function hud:getCash()
   local text = self.bar.cashLabel:getText()
   text = tonumber(text:sub(3, #text))
