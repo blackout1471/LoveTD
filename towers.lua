@@ -2,7 +2,8 @@ t_towerList =
 {
   'cannon',
   'laser',
-  'flamethrower'
+  'flamethrower',
+  'nuclear'
 }
 
 Towers = 
@@ -31,12 +32,12 @@ Towers =
       name            = 'Laser',
       description     = 'Laser tower, that will melt all chickens that are nearby.',
       aoe             = 0,
-      rps             = 4,
-      damage          = 2,
+      rps             = 7,
+      damage          = 1.5,
       projectileType  = 'laser',
       cost            = 20,
       icon            = '', -- make
-      range           = 100,
+      range           = 150,
       size            = {w = 32, h = 32},
       renderType      = 'laser_1',
       parts           = {
@@ -45,13 +46,31 @@ Towers =
                         }
       
     },
+    ['nuclear'] =
+    {
+      name            = 'Nuclear',
+      description     = 'Total annihilation of all chickens, be careful when you use this.',
+      aoe             = 0,
+      rps             = 0.2,
+      damage          = 200,
+      projectileType  = 'nuclear',
+      cost            = 110,
+      icon            = '', -- make
+      range           = 300,
+      size            = {w = 50, h = 50},
+      renderType      = 'laser_1',
+      parts           = {
+                          base  = {skin = 'Nuclear_base.png'},
+                          top   = {skin = 'Nuclear_top.png'}
+                        }
+    },
     ['flamethrower'] =
     {
       name            = 'Flamethrower',
       description     = 'If you like your chickens grilled, this is the tower for you.',
       aoe             = 3,
       rps             = 20,
-      damage          = 0.75,
+      damage          = 1,
       projectileType  = 'flame',
       cost            = 40,
       icon            = '', -- make

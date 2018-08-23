@@ -25,6 +25,12 @@ t_projectiles = {
         speed = 150,
         amount = 1,
         size = {14, 14}
+    },
+    ['nuclear'] = {
+        skin = 'nuclear_shot.png',
+        speed = 300,
+        amount = 1,
+        size = {20, 40}
     }
 }
 
