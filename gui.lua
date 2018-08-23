@@ -627,8 +627,8 @@ end
 registerGameCallBack('update', 'gui_DoHoverHandler')
 
 function gui_remove_all()
-  for k, gui in ipairs(gui.objects) do
-    if curGuiHoverObject == gui then
+  for k, guiObj in ipairs(gui.objects) do
+    if curGuiHoverObject == guiObj then
       curGuiHoverObject = nil
     end
     

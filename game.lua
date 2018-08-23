@@ -376,12 +376,7 @@ function gameEnemiesMove_update(dt)
         gameObj.hud:setHealth(gameVar.lives)
         gameVar.enemyCounter = gameVar.enemyCounter - 1
       else
-        gameVar.lives = gameVar.lives - 1
-        gameObj.hud:setHealth(gameVar.lives)
-        gameObj.projectiles = {}
-        gameObj.enemies     = {}
-        gameVar.enemyCounter = 0
-        gameObj.hud:setText("You Lost!")
+        game_do_lost()
       end
     end
   end
@@ -492,4 +487,30 @@ function game_do_keyPressed(key, scanCode, isKeyRepeat)
       end
     end
   end
+end
+
+-- Games lost, reset everything and go to menu
+function game_do_lost()
+    gameVar.lives = 0
+    gameObj.hud:setHealth(gameVar.lives)
+    gameObj.projectiles = {}
+    gameObj.enemies     = {}
+    gameObj.towers     = {}
+    gameVar.enemyCounter = 0
+    gameObj.hud:setText("You Lost!")
+    
+    -- deregister Game Logic
+    deregisterGameCallBack('update', 'gameSpawnEnemies_update')
+    deregisterGameCallBack('update', 'gameEnemiesMove_update')
+    deregisterGameCallBack('update', 'tower_attackEnemies_update')
+    deregisterGameCallBack('keypressed', 'game_do_keyPressed')
+    deregisterGameCallBack('mousepressed', 'game_do_mousepressed')
+    deregisterGameCallBack('draw', 'game_do_draw')
+    
+    -- Destroy all gui objects
+    gui_remove_all()
+    
+    -- Go to Main Menu
+    menu.main.create()
+    
 end
