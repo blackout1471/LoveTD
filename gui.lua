@@ -20,7 +20,8 @@ gui =
 local t_fonts =
 {
   ['Buttons'] = love.graphics.newFont('/font/butFont.otf', 20),
-  ['Maps']    = love.graphics.newFont(12)
+  ['Maps']    = love.graphics.newFont(12),
+  ['TowerMenu'] = love.graphics.newFont(10)
 }
 
 Colors =
@@ -123,6 +124,7 @@ function gui.Buttons:destroy() -- Destroy button
   self = nil
 end
 
+
 function gui.Buttons:setText(strText)
   self.text   = strText
   self.textX  = self.x + (self.w/2) - self.font:getWidth(strText)/2
@@ -186,6 +188,7 @@ function gui.createLabel(intX, intY, strText, t_color, t_font)
   obj.h       = fontH
   obj.text    = strText
   obj.color   = t_color
+  obj.limit   = 800 -- how many pixels it may go horizontal
   obj.font    = font
   obj.bbox    = {intX, intY, intX+fontW, intY+fontH}
   
@@ -195,7 +198,7 @@ end
 function gui.Labels:render()
   love.graphics.setColor(unpack(self.color))
   love.graphics.setFont(self.font)
-  love.graphics.print(self.text, self.x, self.y)
+  love.graphics.printf(self.text, self.x, self.y, self.limit)
 end
 
 function gui.Labels:destroy()
@@ -218,6 +221,12 @@ function gui.Labels:setPosition(intX, intY)
   self.y = intY
   
   self.bbox = {self.x, self.y, self.x+self.w, self.y+self.h}
+  
+  return true
+end
+
+function gui.Labels:setWrapLimit(intLimit)
+  self.limit = intLimit
   
   return true
 end
