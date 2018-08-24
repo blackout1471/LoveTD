@@ -64,6 +64,10 @@ function game.loadMap(imageMap, mapName)
     print(mapName .. ':' .. 'Missing MapData')
   end
   
+  -- Create bg Music
+  sounds.game_bg:setLooping(true)
+  sounds.game_bg:play()
+  
   -- load default settings, and register gameCallBacks
   gameObj = {towers = {}, enemies = {}, enemyQueue = {}, hud = {}, menu = {}, projectiles = {}, upgradeMenu = {}}
   gameVar = {lives = 1, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
@@ -203,7 +207,7 @@ end
 
 function tower_openUpgradeMenu(tower)
   local mx, my = love.mouse.getPosition()
-  local sizeX, sizeY = 150, 200
+  local sizeX, sizeY = 150, 250
   local pos = {0, love.graphics.getHeight() - sizeY}
   
   local t_inf = Towers[tower.towerType]
@@ -224,6 +228,7 @@ function tower_upgradeBtnClick()
     if (curCash >= Towers[curObj.towerType .. curObj.level+1].cost) then
       local oldTower = curObj
       local newTower = create_tower(curObj.towerType .. curObj.level+1)
+      newTower.level = newTower.level + 1
       local costForNew = Towers[curObj.towerType .. curObj.level+1].cost
       local pay = curCash - costForNew
       
@@ -237,6 +242,9 @@ function tower_upgradeBtnClick()
       
       tower_destroy(curObj) -- destroy tower
       tower_destroyUpgradeMenu() -- destroy menu
+      
+      -- play click sound
+      sounds.click:play()
       
       return true
     end
@@ -252,6 +260,9 @@ function tower_sellBtnClick()
   tower_destroy(curObj) -- destroy tower
   gameObj.hud:setCash(cashBack)
   tower_destroyUpgradeMenu()
+  
+  -- play click sound
+  sounds.click:play()
   
   return true
 end
@@ -496,21 +507,20 @@ end
 
 -- Games lost, reset everything and go to menu
 function game_do_lost()
-    gameVar.lives = 0
-    gameObj.hud:setHealth(gameVar.lives)
-    gameObj.projectiles = {}
-    gameObj.enemies     = {}
-    gameObj.towers     = {}
-    gameVar.enemyCounter = 0
-    gameObj.hud:setText("You Lost!")
-    
-    -- deregister Game Logic
+    -- Deregister update functions
     deregisterGameCallBack('update', 'gameSpawnEnemies_update')
     deregisterGameCallBack('update', 'gameEnemiesMove_update')
     deregisterGameCallBack('update', 'tower_attackEnemies_update')
+  
+    gameObj.hud:setText("You Lost!")
+    gameObj.towers, gameObj.enemies, gameObj.enemyQueue, gameObj.menu, gameObj.projectiles, upgradeMenu = {}, {}, {}, {}, {}
+    gameVar = {lives = 1, cash = 100, wave = 0, spawnTick = 0, enemyCounter = 0}
+    gameVar.enemyCounter = 0
+    
+    -- deregister Game Event Logic
+    deregisterGameCallBack('draw', 'game_do_draw')
     deregisterGameCallBack('keypressed', 'game_do_keyPressed')
     deregisterGameCallBack('mousepressed', 'game_do_mousepressed')
-    deregisterGameCallBack('draw', 'game_do_draw')
     
     -- Destroy all gui objects
     gui_remove_all()

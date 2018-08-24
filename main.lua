@@ -2,6 +2,7 @@
 
 local files = 
 {
+    'audio',
     'gui',
     'utility',
     'menu',
