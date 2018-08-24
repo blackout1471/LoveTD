@@ -45,7 +45,7 @@ Towers =
                           top   = {skin = 'laser_top1.png'}
                         }
       
-    },
+    }, 
     ['nuclear'] =
     {
       name            = 'Nuclear',

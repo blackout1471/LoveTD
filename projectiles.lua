@@ -4,7 +4,7 @@
 
 --]]
 
-local imgDir = '/img/'
+local imgDir = '/img/' 
 
 t_projectiles = {
   
