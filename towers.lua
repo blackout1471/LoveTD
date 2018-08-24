@@ -18,7 +18,7 @@ Towers =
       projectileType  = 'cannon', -- What kind of projectile, to be fired
       cost            = 10,
       icon            = 'cannon_icon1', -- Menu icon, and also determines if it should be in menu, if not it's a upgrade
-      range           = 50, -- seen in pixels
+      range           = 90, -- seen in pixels
       size            = {w = 32, h = 32},
       renderType      = 'canon_1',
       parts           = {
@@ -33,11 +33,11 @@ Towers =
       description     = 'Laser tower, that will melt all chickens that are nearby.',
       aoe             = 0,
       rps             = 7,
-      damage          = 1.1,
+      damage          = 1.4,
       projectileType  = 'laser',
       cost            = 20,
       icon            = '', -- make
-      range           = 150,
+      range           = 130,
       size            = {w = 32, h = 32},
       renderType      = 'laser_1',
       parts           = {
@@ -83,22 +83,60 @@ Towers =
                         }
       
     },
+    ['flamethrower2'] =
+    {
+      name            = 'Flamethrower',
+      description     = 'If you like your chickens grilled, this is the tower for you.',
+      aoe             = 3,
+      rps             = 20,
+      damage          = 2.4,
+      projectileType  = 'flame',
+      cost            = 80,
+      icon            = '', -- make
+      range           = 80,
+      size            = {w = 32, h = 32},
+      renderType      = 'flame_1',
+      parts           = {
+                          base  = {skin = 'Flame_Base1.png'},
+                          top   = {skin = 'Flame_Top1.png'}
+                        }
+      
+    },
     ['laser2'] = --TEST FOR AN UPGRADE
     {
-      name            = 'Cannon', -- Name that will be displayed in menu
-      description     = 'Cannon that shoots balls as big as watermelons, As efficient as it is expensive.', -- description
-      aoe             = 0, -- area of effect, the area the projectile will reach.
-      rps             = 1, -- round per second
-      damage          = 5,
-      projectileType  = 'cannon', -- What kind of projectile, to be fired
-      cost            = 30,
-      icon            = 'cannon_icon1', -- Menu icon, and also determines if it should be in menu, if not it's a upgrade
-      range           = 50, -- seen in pixels
+       name            = 'Laser2',
+      description     = 'Laser tower, that will melt all chickens that are nearby.',
+      aoe             = 0,
+      rps             = 10,
+      damage          = 2,
+      projectileType  = 'laser',
+      cost            = 40,
+      icon            = '', -- make
+      range           = 140,
       size            = {w = 32, h = 32},
-      renderType      = 'canon_1',
+      renderType      = 'laser_1',
       parts           = {
-                          base = {skin = 'cannon_base1.png'},
-                          top  = {skin = 'cannon_top1.png'}
+                          base  = {skin = 'laser_base1.png'},
+                          top   = {skin = 'laser_top1.png'}
+                        }
+      
+    },
+    ['laser23'] = --TEST FOR AN UPGRADE
+    {
+       name            = 'Laser3',
+      description     = 'Laser tower, that will melt all chickens that are nearby.',
+      aoe             = 0,
+      rps             = 12,
+      damage          = 4,
+      projectileType  = 'laser',
+      cost            = 100,
+      icon            = '', -- make
+      range           = 140,
+      size            = {w = 32, h = 32},
+      renderType      = 'laser_1',
+      parts           = {
+                          base  = {skin = 'laser_base2.png'},
+                          top   = {skin = 'laser_top1.png'}
                         }
       
     }

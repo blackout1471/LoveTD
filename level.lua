@@ -17,6 +17,9 @@ Level =
   {
     {enemyType = 'starter', interval = 1, amount = 10},
     {enemyType = 'starter1', interval = 1, amount = 10},
+    {enemyType = 'starter2', interval = 1, amount = 10},
+    {enemyType = 'starter3', interval = 1, amount = 10},
+    {enemyType = 'starter4', interval = 1, amount = 10},
     {enemyType = 'starterfast', interval = 0.5, amount = 20},
     {enemyType = 'miniboss', interval = 2, amount = 5},
     {enemyType = 'boss', interval = 2, amount = 1},

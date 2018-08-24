@@ -224,6 +224,7 @@ function tower_upgradeBtnClick()
     if (curCash >= Towers[curObj.towerType .. curObj.level+1].cost) then
       local oldTower = curObj
       local newTower = create_tower(curObj.towerType .. curObj.level+1)
+      newTower.level = newTower.level + 1
       local costForNew = Towers[curObj.towerType .. curObj.level+1].cost
       local pay = curCash - costForNew
       

@@ -22,7 +22,7 @@ t_projectiles = {
     },
     ['flame'] = {
         skin = 'Flame_shot.png',
-        speed = 150,
+        speed = 190,
         amount = 1,
         size = {14, 14}
     },

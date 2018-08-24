@@ -17,15 +17,15 @@ t_enemies = {
     },
     ['boss'] = 
     {
-      health  = 600,
+      health  = 1000,
       speed   = 30, -- pixels per frame
       skin    = 'boss1.png',
       size    = {32, 32},
-      cash    = 30
+      cash    = 50
     },
     ['starter'] = 
     {
-      health  = 8,
+      health  = 13,
       speed   = 50, -- pixels per frame
       skin    = 'starter_mob.png',
       size    = {16, 16},
@@ -33,31 +33,55 @@ t_enemies = {
     },
     ['starter1'] = 
     {
-      health  = 13,
+      health  = 26,
       speed   = 50, -- pixels per frame
-      skin    = 'starter_mob1.png',
+      skin    = 'starter_mob.png',
       size    = {16, 16},
       cash    = 2
     },
-    ['starterfast'] = 
+    ['starter2'] = 
     {
-      health  = 6,
-      speed   = 100, -- pixels per frame
-      skin    = 'starter_mobfast.png',
+      health  = 35,
+      speed   = 50, -- pixels per frame
+      skin    = 'starter_mob.png',
       size    = {16, 16},
       cash    = 3
     },
+    ['starter3'] = 
+    {
+      health  = 50,
+      speed   = 50, -- pixels per frame
+      skin    = 'starter_mob1.png',
+      size    = {16, 16},
+      cash    = 4
+    },
+    ['starter4'] = 
+    {
+      health  = 70,
+      speed   = 50, -- pixels per frame
+      skin    = 'starter_mob1.png',
+      size    = {16, 16},
+      cash    = 5
+    },
+    ['starterfast'] = 
+    {
+      health  = 30,
+      speed   = 130, -- pixels per frame
+      skin    = 'starter_mobfast.png',
+      size    = {16, 16},
+      cash    = 6
+    },
     ['miniboss'] = 
     {
-      health  = 100,
+      health  = 220,
       speed   = 30, -- pixels per frame
       skin    = 'firstboss.png',
       size    = {22, 22},
-      cash    = 5
+      cash    = 6
     },
     ['secondmob'] = 
     {
-      health  = 130,
+      health  = 220,
       speed   = 50, -- pixels per frame
       skin    = 'second_mob.png',
       size    = {22, 22},
