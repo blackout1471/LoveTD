@@ -224,11 +224,16 @@ function tower_upgradeBtnClick()
     if (curCash >= Towers[curObj.towerType .. curObj.level+1].cost) then
       local oldTower = curObj
       local newTower = create_tower(curObj.towerType .. curObj.level+1)
+      local costForNew = Towers[curObj.towerType .. curObj.level+1].cost
+      local pay = curCash - costForNew
+      
+      gameObj.hud:setCash(pay)
       
       table.insert(gameObj.towers, newTower)
       
       newTower:setPosition(oldTower.x, oldTower.y)
       newTower:setClickHandler('tower_click')
+      newTower.canAttack = true
       
       tower_destroy(curObj) -- destroy tower
       tower_destroyUpgradeMenu() -- destroy menu

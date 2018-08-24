@@ -26,7 +26,7 @@ t_enemies = {
     ['starter'] = 
     {
       health  = 8,
-      speed   = 500, -- pixels per frame
+      speed   = 50, -- pixels per frame
       skin    = 'starter_mob.png',
       size    = {16, 16},
       cash    = 1
