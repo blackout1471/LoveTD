@@ -20,8 +20,8 @@ gui =
 local t_fonts =
 {
   ['Buttons'] = love.graphics.newFont('/font/butFont.otf', 20),
-  ['Maps']    = love.graphics.newFont(12),
-  ['TowerMenu'] = love.graphics.newFont(10)
+  ['Maps']    = love.graphics.newFont('/font/tower_text.ttf', 12),
+  ['TowerMenu'] = love.graphics.newFont('/font/tower_text.ttf', 10)
 }
 
 Colors =

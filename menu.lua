@@ -39,6 +39,11 @@ local intYCounter = 0
 --]]
 
 function menu.main.create()
+  -- play bg music
+  sounds.intro:setVolume(sounds.volume)
+  sounds.intro:setLooping(true)
+  sounds.intro:play()
+  
   -- reset y counter
   intYCounter = 0
   
@@ -73,22 +78,30 @@ function menu.main.destroy()
 end
 
 function menu_main_play_click(button)
+  sounds.click:setVolume(sounds.volume)
+  sounds.click:play()
   menu.play.create()
   menu.main.destroy()
 end
 
 function menu_main_settings_click(button)
+  sounds.click:setVolume(sounds.volume)
+  sounds.click:play()
   menu.settings.create()
   menu.main.destroy()
 end
 
 function menu_main_quit_click(button)
+  sounds.click:setVolume(sounds.volume)
+  sounds.click:play()
   love.event.quit()
 end
 
 function menu_main_hoverEnter(button)
   button:setbgColor(Colors.lightGrey)
   button:setSize(menu_size.w+10, menu_size.h+10)
+  sounds.hover:setVolume(sounds.volume)
+  sounds.hover:play()
 end
 
 function menu_main_hoverExit(button)
@@ -129,6 +142,8 @@ function menu.play.destroy()
 end
 
 function menu_play_hoverEnter(button)
+  sounds.hover:setVolume(sounds.volume)
+  sounds.hover:play()
   button:setScale(0.21, 0.21)
 end
 
@@ -137,6 +152,10 @@ function menu_play_hoverExit(button)
 end
 
 function menu_play_mapClick(button)
+  sounds.intro:stop()
+  
+  sounds.click:setVolume(sounds.volume)
+  sounds.click:play()
   game.loadMap(button:getImage(), button.mapName)
   menu.play.destroy()
 end
@@ -161,6 +180,8 @@ function menu.settings.destroy()
 end
 
 function menu_settings_hoverEnter(button)
+  sounds.hover:setVolume(sounds.volume)
+  sounds.hover:play()
   button:setbgColor(Colors.lightGrey)
   button:setSize(menu_size.w+10, menu_size.h+10)
 end
