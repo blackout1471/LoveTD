@@ -65,6 +65,7 @@ function game.loadMap(imageMap, mapName)
   end
   
   -- Create bg Music
+  sounds.game_bg:setVolume(sounds.volume)
   sounds.game_bg:setLooping(true)
   sounds.game_bg:play()
   
@@ -244,6 +245,7 @@ function tower_upgradeBtnClick()
       tower_destroyUpgradeMenu() -- destroy menu
       
       -- play click sound
+      sounds.click:setVolume(sounds.volume)
       sounds.click:play()
       
       return true
@@ -262,6 +264,7 @@ function tower_sellBtnClick()
   tower_destroyUpgradeMenu()
   
   -- play click sound
+  sounds.click:setVolume(sounds.volume)
   sounds.click:play()
   
   return true

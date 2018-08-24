@@ -152,6 +152,7 @@ function gameMenu_clickTowerButton(button)
   local mx, my = love.mouse.getPosition()
   --Create tower and play click sound
   gameCreateTower(mx, my, button.text:lower())
+  sounds.click:setVolume(sounds.volume)
   sounds.click:play()
 end
 
@@ -161,6 +162,7 @@ function gameMenu_hoverEnter()
     if k == 'rectangle' then c = 'color' else c = 'bgColor' end
     local clr = {menuItems[c][1], menuItems[c][2], menuItems[c][3], 1}
     menuItems[c] = clr
+    sounds.hover:setVolume(sounds.volume)
     sounds.hover:play()
   end
 end

@@ -23,6 +23,7 @@ end
 
 sounds = 
 {
+  volume = 0.1,
   hover = audio_getSource ('mouse_hover_button.mp3'), 
   click = audio_getSource('mouse_button_click.mp3'), 
   intro = audio_getSource('game_intro.wav'), 
